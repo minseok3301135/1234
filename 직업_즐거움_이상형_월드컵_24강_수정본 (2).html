@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>직업 즐거움 이상형 월드컵 24강</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: #f4f5f7;
+      color: #111827;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      height: 54px;
+      flex: 0 0 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: #fff;
+      border-bottom: 1px solid #d1d5db;
+      font-weight: 800;
+      position: relative;
+      z-index: 5;
+    }
+
+    .round { font-size: 18px; }
+    .score { font-size: 15px; color: #6b7280; }
+
+    .game {
+      flex: 1;
+      min-height: calc(100vh - 54px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .choice {
+      border: 0;
+      border-radius: 0;
+      padding: 38px 34px;
+      cursor: pointer;
+      min-width: 0;
+      min-height: calc(100vh - 54px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: 900;
+      line-height: 1.24;
+      word-break: keep-all;
+      transition: filter .12s ease, transform .08s ease;
+      overflow: hidden;
+    }
+
+    .choice-left {
+      background: #fff;
+      border-right: 2px solid #111827;
+    }
+
+    .choice-right { background: #eceff3; }
+
+    .choice:hover { filter: brightness(.97); }
+    .choice:active { transform: scale(.994); }
+
+    .job {
+      font-size: clamp(34px, 4.6vw, 72px);
+      margin-bottom: 28px;
+    }
+
+    .activity {
+      font-size: clamp(24px, 3.1vw, 48px);
+      font-weight: 750;
+      color: #374151;
+      max-width: 92%;
+    }
+
+    .keyhint {
+      margin-top: 34px;
+      font-size: 14px;
+      color: #9ca3af;
+      font-weight: 650;
+    }
+
+    .result {
+      display: none;
+      min-height: 100vh;
+      padding: 48px 24px;
+      background: #fff;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result-inner {
+      width: min(900px, 94vw);
+      margin: 0 auto;
+    }
+
+    .winner-label {
+      font-size: 21px;
+      color: #6b7280;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .winner-job {
+      font-size: clamp(42px, 7vw, 86px);
+      font-weight: 950;
+      margin: 0 0 24px;
+      line-height: 1.1;
+    }
+
+    .winner-activity {
+      font-size: clamp(24px, 3vw, 38px);
+      line-height: 1.45;
+      color: #374151;
+      font-weight: 750;
+      margin-bottom: 34px;
+    }
+
+    .joy-box {
+      border: 2px solid #111827;
+      padding: 24px 20px;
+      margin: 0 auto 26px;
+      max-width: 620px;
+    }
+
+    .joy-title {
+      font-size: 18px;
+      color: #6b7280;
+      font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    .joy-name {
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 950;
+    }
+
+    .result-note {
+      font-size: 17px;
+      line-height: 1.6;
+      color: #4b5563;
+      margin: 0 auto 28px;
+      max-width: 650px;
+    }
+
+    .restart {
+      appearance: none;
+      border: 0;
+      background: #111827;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      padding: 14px 26px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        height: 48px;
+        flex-basis: 48px;
+        padding: 0 12px;
+      }
+
+      .round { font-size: 16px; }
+      .score { font-size: 13px; }
+
+      .game { min-height: calc(100vh - 48px); }
+
+      .choice {
+        min-height: calc(100vh - 48px);
+        padding: 24px 14px;
+      }
+
+      .job {
+        font-size: clamp(28px, 7vw, 44px);
+        margin-bottom: 20px;
+      }
+
+      .activity {
+        font-size: clamp(20px, 5.2vw, 32px);
+      }
+
+      .keyhint { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <section id="playScreen">
+    <div class="topbar">
+      <div id="roundLabel" class="round">24강</div>
+      <div id="scoreLabel" class="score">1 / 12</div>
+    </div>
+
+    <main class="game">
+      <button id="leftBtn" class="choice choice-left" type="button">
+        <div id="leftJob" class="job"></div>
+        <div id="leftActivity" class="activity"></div>
+        <div class="keyhint">← 왼쪽 선택</div>
+      </button>
+
+      <button id="rightBtn" class="choice choice-right" type="button">
+        <div id="rightJob" class="job"></div>
+        <div id="rightActivity" class="activity"></div>
+        <div class="keyhint">오른쪽 선택 →</div>
+      </button>
+    </main>
+  </section>
+
+  <section id="resultScreen" class="result">
+    <div class="result-inner">
+      <div class="winner-label">나에게 가장 끌린 직업·활동</div>
+      <h1 id="winnerJob" class="winner-job"></h1>
+      <div id="winnerActivity" class="winner-activity"></div>
+
+      <div class="joy-box">
+        <div class="joy-title">이 선택에서 드러난 즐거움</div>
+        <div id="winnerJoy" class="joy-name"></div>
+      </div>
+
+      <p class="result-note">
+        이 결과가 내 진로를 정해 주는 것은 아닙니다.
+        내가 어떤 종류의 활동에서 즐거움을 느끼는지 생각해 보는 자료로 활용해 보세요.
+      </p>
+
+      <button id="restartBtn" class="restart" type="button">다시 하기</button>
+    </div>
+  </section>
+
+  <script>
+    const options = [
+      { joy: "돈벌이의 즐거움", job: "성과급이 큰 영업 전문가", activity: "내가 계약을 많이 성사시킬수록 더 높은 수입을 얻는다." },
+      { joy: "돈벌이의 즐거움", job: "온라인 쇼핑몰 창업가", activity: "잘 팔릴 상품을 찾아 판매하고 사업을 키워 수익을 늘린다." },
+
+      { joy: "아름다움의 즐거움", job: "헤어디자이너", activity: "사람에게 어울리는 머리 모양과 색을 골라 더 멋지게 변화시킨다." },
+      { joy: "아름다움의 즐거움", job: "인테리어 디자이너", activity: "공간의 색, 가구, 조명을 조합해 보기 좋고 편안한 공간을 만든다." },
+
+      { joy: "창작의 즐거움", job: "게임 기획자", activity: "새로운 세계관, 캐릭터, 규칙을 상상해 세상에 없던 게임을 만든다." },
+      { joy: "창작의 즐거움", job: "웹툰 작가", activity: "내가 만든 인물과 이야기를 그림과 대사로 표현해 새로운 작품을 만든다." },
+
+      { joy: "이해하는 즐거움", job: "고생물학자", activity: "화석과 지층을 조사해 오래전 생물이 어떻게 살았는지 알아낸다." },
+      { joy: "이해하는 즐거움", job: "천문학자", activity: "별과 우주를 관찰하고 아직 밝혀지지 않은 우주의 원리를 연구한다." },
+
+      { joy: "주목받는 즐거움", job: "가수", activity: "많은 관객 앞에서 공연하고 사람들의 박수와 관심을 받는다." },
+      { joy: "주목받는 즐거움", job: "방송 진행자", activity: "카메라 앞에서 프로그램을 진행하며 많은 사람에게 내 모습을 보여 준다." },
+
+      { joy: "기술의 즐거움", job: "로봇 엔지니어", activity: "정밀한 부품과 프로그램을 다루어 실제로 움직이는 로봇을 만든다." },
+      { joy: "기술의 즐거움", job: "자동차 정비사", activity: "자동차의 고장 원인을 찾아 도구와 장비를 사용해 정확하게 수리한다." },
+
+      { joy: "남을 돕는 즐거움", job: "상담사", activity: "힘든 일을 겪는 사람의 이야기를 듣고 문제를 해결할 수 있도록 돕는다." },
+      { joy: "남을 돕는 즐거움", job: "소방관", activity: "위험한 상황에 출동해 사람을 구조하고 안전하게 대피하도록 돕는다." },
+
+      { joy: "앞장서는 즐거움", job: "프로젝트 팀장", activity: "여러 사람의 의견을 모으고 방향을 정해 팀을 이끌어 목표를 완성한다." },
+      { joy: "앞장서는 즐거움", job: "영화감독", activity: "배우와 촬영팀에게 방향을 제시하고 전체 촬영을 이끌어 하나의 영화를 완성한다." },
+
+      { joy: "가르치는 즐거움", job: "과학 교사", activity: "학생들이 몰랐던 원리를 실험과 설명을 통해 이해하도록 돕는다." },
+      { joy: "가르치는 즐거움", job: "스포츠 코치", activity: "선수의 동작을 관찰하고 더 잘할 수 있도록 방법을 알려 주고 훈련시킨다." },
+
+      { joy: "질서의 즐거움", job: "물류 관리자", activity: "수많은 물건이 정해진 장소와 시간에 정확히 도착하도록 체계적으로 관리한다." },
+      { joy: "질서의 즐거움", job: "회계사", activity: "회사의 돈이 어디서 들어오고 나갔는지 숫자와 자료를 정확하게 정리한다." },
+
+      { joy: "자연의 즐거움", job: "생태 연구원", activity: "숲과 들을 돌아다니며 야생동물과 식물의 모습을 관찰하고 기록한다." },
+      { joy: "자연의 즐거움", job: "산림 관리원", activity: "숲을 돌아다니며 나무와 산림의 상태를 살피고 자연을 건강하게 관리한다." },
+
+      { joy: "독립의 즐거움", job: "프리랜서 디자이너", activity: "회사에 소속되지 않고 내가 맡을 일과 일하는 방식을 스스로 정한다." },
+      { joy: "독립의 즐거움", job: "1인 공방 운영자", activity: "내 작업실에서 만들 제품과 작업 시간을 스스로 정해 혼자 사업을 운영한다." }
+    ];
+
+    const playScreen = document.getElementById("playScreen");
+    const resultScreen = document.getElementById("resultScreen");
+    const leftBtn = document.getElementById("leftBtn");
+    const rightBtn = document.getElementById("rightBtn");
+    const leftJob = document.getElementById("leftJob");
+    const rightJob = document.getElementById("rightJob");
+    const leftActivity = document.getElementById("leftActivity");
+    const rightActivity = document.getElementById("rightActivity");
+    const roundLabel = document.getElementById("roundLabel");
+    const scoreLabel = document.getElementById("scoreLabel");
+    const restartBtn = document.getElementById("restartBtn");
+
+    let matches = [];
+    let matchIndex = 0;
+    let winners = [];
+    let byePlayers = [];
+    let roundName = "24강";
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function pairUp(players) {
+      const out = [];
+      for (let i = 0; i < players.length; i += 2) {
+        out.push([players[i], players[i + 1]]);
+      }
+      return out;
+    }
+
+    function startRound(players, name, byeCount = 0) {
+      const shuffled = shuffle(players);
+      roundName = name;
+      winners = [];
+      matchIndex = 0;
+
+      if (byeCount > 0) {
+        const playCount = shuffled.length - byeCount;
+        const playing = shuffled.slice(0, playCount);
+        byePlayers = shuffled.slice(playCount);
+        matches = pairUp(playing);
+      } else {
+        byePlayers = [];
+        matches = pairUp(shuffled);
+      }
+
+      renderMatch();
+    }
+
+    function makeInitialRound() {
+      startRound(options, "24강", 0); // 24명 전원 등장 → 12경기
+    }
+
+    function renderMatch() {
+      const [left, right] = matches[matchIndex];
+
+      roundLabel.textContent = roundName;
+      scoreLabel.textContent = `${matchIndex + 1} / ${matches.length}`;
+
+      leftJob.textContent = left.job;
+      leftActivity.textContent = left.activity;
+      rightJob.textContent = right.job;
+      rightActivity.textContent = right.activity;
+    }
+
+    function choose(side) {
+      const selected = matches[matchIndex][side === "left" ? 0 : 1];
+      winners.push(selected);
+      matchIndex++;
+
+      if (matchIndex < matches.length) {
+        renderMatch();
+        return;
+      }
+
+      if (roundName === "24강") {
+        // 12명 남음 → 8명만 플레이, 4명 부전승 → 8강
+        startRound(winners, "12강", 4);
+      } else if (roundName === "12강") {
+        startRound([...winners, ...byePlayers], "8강", 0);
+      } else if (roundName === "8강") {
+        startRound(winners, "4강", 0);
+      } else if (roundName === "4강") {
+        startRound(winners, "결승", 0);
+      } else {
+        showWinner(winners[0]);
+      }
+    }
+
+    function showWinner(winner) {
+      playScreen.style.display = "none";
+      resultScreen.style.display = "flex";
+
+      document.getElementById("winnerJob").textContent = winner.job;
+      document.getElementById("winnerActivity").textContent = winner.activity;
+      document.getElementById("winnerJoy").textContent = winner.joy;
+    }
+
+    function restart() {
+      resultScreen.style.display = "none";
+      playScreen.style.display = "block";
+      makeInitialRound();
+    }
+
+    leftBtn.addEventListener("click", () => choose("left"));
+    rightBtn.addEventListener("click", () => choose("right"));
+    restartBtn.addEventListener("click", restart);
+
+    document.addEventListener("keydown", (event) => {
+      if (playScreen.style.display === "none") return;
+      const active = document.activeElement;
+      if (active && ["INPUT", "TEXTAREA", "SELECT"].includes(active.tagName)) return;
+
+      if (event.key === "ArrowLeft") choose("left");
+      if (event.key === "ArrowRight") choose("right");
+    });
+
+    makeInitialRound();
+  </script>
+</body>
+</html>
